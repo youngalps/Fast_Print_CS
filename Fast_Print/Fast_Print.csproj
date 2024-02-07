@@ -11,7 +11,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.1.0" />
+    <PackageReference Include="FreeSpire.PDF" Version="8.6.0" />
     <PackageReference Include="Pdfium.Net.SDK" Version="4.88.2704" />
+    <PackageReference Include="PdfSharp" Version="6.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Linq.Async" Version="4.0.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />

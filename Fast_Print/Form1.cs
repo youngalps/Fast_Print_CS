@@ -1,134 +1,173 @@
-﻿using System;
+﻿
+
+using System;
+using System.Diagnostics;
 using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Patagames.Pdf.Net;
-using Patagames.Pdf.Net.Pdf
 using CsvHelper;
+using CsvHelper.Configuration.Attributes;
+
+
+
+
+
 
 namespace Fast_Print
 {
+
+
     public partial class Form1 : Form
     {
-        // Contants
+        // need a way to check if the user has selected a file before printing.
+        private bool canPrint = false;
 
 
-        private const string FolderPath = @"C:\Users\gedmsinv\OneDrive - GED Integrated Solutions\Desktop\DWG"; // TODO: set this to the network drive
-        private const string Separator = ";";
+
+
+        // TODO: Make this a user input (buttons most likely
+        private const string DefaultFolderPath = @"C:\Users\gedmsinv\OneDrive - GED Integrated Solutions\Desktop\DWG";
+        private const string ClipboardSeparator = ";";
 
         public Form1()
         {
             InitializeComponent();
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+
         }
+
+
+
+
 
         private void Btn_SelectFile_Click(object sender, EventArgs e)
         {
-            OpenCsvFileDialog();
-        }
+            OpenCsvFileBrowserDialog();
+            if (FileGridView.RowCount > 0)
+            {
+                canPrint = true;
+            }
+            else
+            {
+                canPrint = false;
+            }
 
+        } // Open CSV File Button
 
         private void Btn_PrintFiles_Click(object sender, EventArgs e)
         {
-            PrintSelectedPDF();
-        }
-
-        // Lets see what comes out 
-        private void PrintSelectedPDF()
-        {
-            foreach (DataGridViewRow row in dataGridView1.SelectedRows)
+            if (canPrint == true)
             {
-                // Get the selected part number and revision
-                string partNumber = row.Cells[0].Value.ToString();
-                string revision = row.Cells[1].Value.ToString();
-
-                // Construct the full PDF path
-                string pdfPath = Path.Combine(FolderPath, partNumber + revision + ".PDF");
-
-                // Print the selected PDF
-                PrintPDF(pdfPath);
+                PrintSelectedPDF();
+            }
+            else
+            {
+                ShowErrorMessageBox("No Files Selected", null);
             }
 
-
         }
 
-        private void PrintPDF(string pdfPath)
-        {
 
-            try
+        private async void PrintSelectedPDF()
+        {
+            foreach (DataGridViewRow row in FileGridView.Rows)
             {
-                using (PdfDocument document = PdfDocument.Load(pdfPath))
-                {
-                    using (PrintDocument printDocument = new PrintDocument())
+                //Get the selected part number and revision
+                if (!String.IsNullOrEmpty(row.Cells[1].Value.ToString()))
+                    if (FileGridView.RowCount > 1)
                     {
-                        printDocument.PrintPage += (sender, e) =>
+
                         {
-                            document.Render(e.Graphics, e.PageBounds, 0);
-                            document.
-                        };
+                            string folderRelativePath = row.Cells[0].Value.ToString();
+                            string partNumber = row.Cells[1].Value.ToString();
+                            string revision = row.Cells[2].Value.ToString();
 
-                        printDocument.Print();
+                            string pdfFilePath = DefaultFolderPath + folderRelativePath + partNumber + revision; // TODO Make PathCombine Work
+
+
+                            PdfPrinter printer = new PdfPrinter();
+                            printer.AddToPrintQueue(pdfFilePath);
+
+                            await Task.Delay(1000);
+                        }
                     }
-                }
-
-                ShowSuccessMessageBox("PDF Printed Successfully");
             }
-            catch (Exception ex)
-            {
-                ShowErrorMessageBox("Error Printing PDF", ex);
-            }
-        }
+        } // Get the users desired PDF and Send it to print
+
+
+      
+
+      
 
 
 
 
 
 
-        private void Form1_Load(object sender, EventArgs e)
+        public void ValidatePartNumbers(string partNumbers)
         {
-            // Method intentionally left empty.
+            ParserMethods parserMethods = new ParserMethods();
+            parserMethods.RemoveTrailingDashAndNumber(partNumbers);
+
+        }
+        public void PopulateGridView(int index, string partNumber, string[] SplitPath, string[] filePathArray) // Populate the DataGridView with the file paths and part numbers
+        {
+
+            // Populate the DataGridView
+            FileGridView.Rows[index].Cells[0].Value = SplitPath[0]; // Set the folder path
+            FileGridView.Rows[index].Cells[1].Value = partNumber; // Set the part number
+            DataGridViewComboBoxCell revisionComboBoxCell = (DataGridViewComboBoxCell)FileGridView.Rows[index].Cells[2]; // Set the combobox cell
+
+            for (Int32 i = 0; i < filePathArray.Length; i++)
+            {
+                revisionComboBoxCell.Items.Add(filePathArray[i]); // Add the file paths to the combobox
+                System.Diagnostics.Debug.WriteLine(filePathArray[i], "Printed");
+                revisionComboBoxCell.Value = revisionComboBoxCell.Items[0]; // Set the default value to the first item in the combobox
+
+            }
+
+
 
         }
 
-        private void LoadCsvData(string filePath)
+        private void LoadCsvFileData(string filePath)
         {
             using var reader = new StreamReader(filePath);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            bool DataFound = false;
             string clipboardContent = "";
-
             var records = csv.GetRecords<CsvRecords>();
+            ;
+
             foreach (var record in records)
             {
                 if (records != null)
                 {
-                    ProcessShopOrder(record.ShopOrder, ref clipboardContent); // goes to clipboard
-                    int currentIndex = dataGridView1.Rows.Add();
-                    dataGridView1.Rows[currentIndex].Cells[0].Value = record.PartNumber;
-                    DataGridViewComboBoxCell placeholder = (DataGridViewComboBoxCell)dataGridView1.Rows[currentIndex].Cells[1];
+                    int currentIndex = FileGridView.Rows.Add();
+                    ValidatePartNumbers(record.PartNumber);
 
-                    String[] tempStr = FindAllFile(record.PartNumber);
-                    for (Int32 i = 0; i < tempStr.Length; i++)
-                    {
-                        placeholder.Items.Add(tempStr[i]);
-                    }
-
-
+                    String[] fileNames = Directory.GetFiles(DefaultFolderPath, record.PartNumber + "*.*", SearchOption.AllDirectories);
+                    String[] PathComponents = fileNames[0].Split(DefaultFolderPath); // Split the file path into the folder path and the part number
+                    String[] filePathArray = FindAllFilePaths(record.PartNumber); // Find all file paths with the part number
+                    PathComponents = PathComponents[1].Split(record.PartNumber); // Split the part number from the file path
+                    PopulateGridView(currentIndex, record.PartNumber, PathComponents, filePathArray);
+                    CopyToClipboard(record.ShopOrder, ref clipboardContent);
 
                 }
             }
+
             ShowSuccessMessageBox("Shop Orders Copied to Clipboard");
+            this.Activate();
+        } // Load CSV File Data and Populate the DataGridView and Clipboard
 
-        }
-
-        private void OpenCsvFileDialog()
+        private void OpenCsvFileBrowserDialog()
         {
             OpenFileDialog openFileDialog = new()
             {
                 Title = "Select CSV File",
-                InitialDirectory = @"C:\",
+                InitialDirectory = "C:\\Users\\gedmsinv\\OneDrive - GED Integrated Solutions\\Desktop\\Excel\\Print Test.csv", //@"C:\",
                 Filter = "CSV Files|*.csv"
             };
 
@@ -137,19 +176,19 @@ namespace Fast_Print
             if (result == DialogResult.OK)
             {
                 string filePath = openFileDialog.FileName;
-                LoadCsvData(filePath);
+                LoadCsvFileData(filePath);
             }
             else
             {
                 ShowErrorMessageBox("File Not Found", null);
             }
-        }
+        } // Open File Dialog and Load CSV File
 
-        private void ProcessShopOrder(string shopOrder, ref string clipboardContent)
+        private void CopyToClipboard(string shopOrder, ref string clipboardContent)
         {
             if (!string.IsNullOrEmpty(clipboardContent))
             {
-                clipboardContent += Separator; // Set Your value here
+                clipboardContent += ClipboardSeparator; // Set Your value here
             }
 
             // add the shop order to the combined shop order
@@ -168,32 +207,43 @@ namespace Fast_Print
         private void ShowErrorMessageBox(string errorMessage, Exception ex)
         {
             MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
+        } // Show Error Message Box
 
         private void ShowSuccessMessageBox(string message)
         {
             MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-        }
+        } // Show Success Message Box
 
-        private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+
+        private string[] FindAllFilePaths(string PartNumber)
         {
-            // Method intentionally left empty.
-        }
+            String[] fileNames = Directory.GetFiles(DefaultFolderPath, PartNumber + "*.*", SearchOption.AllDirectories);
 
-        private string[] FindAllFile(string PartNumber)
-        {
-            String[] TempString = Directory.GetFiles(FolderPath, PartNumber + "*.*", SearchOption.AllDirectories);
-
-            for (int i = 0; i < TempString.Length; i++)
+            if (fileNames.Length > 0)
             {
-                TempString[i] = TempString[i].Substring(TempString[i].IndexOf(PartNumber) + PartNumber.Length);
+                for (int i = 0; i < fileNames.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(fileNames[i]))
+                    {
+                        fileNames[i] = fileNames[i].Substring(fileNames[i].IndexOf(PartNumber) + PartNumber.Length);
+                        System.Diagnostics.Debug.WriteLine(PartNumber, "Printed");
+                    }
+                    else
+                    {
+                        fileNames = new string[1];
+                        fileNames[i] = "No Files Found";
+                    }
+                }
             }
 
-            return TempString;
-        }
+
+            return fileNames;
+
+        } // Find All File Paths
+
+        
+        
     }
+
+
 }
-
-
-
-

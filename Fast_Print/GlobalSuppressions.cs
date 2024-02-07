@@ -5,7 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Lil Smelly", "S1075:URIs should not be hardcoded", Justification = "<Pending>", Scope = "member", Target = "~F:Fast_Print.Form1.FolderPath")]
+[assembly: SuppressMessage("Lil Smelly", "S1075:URIs should not be hardcoded", Justification = "<Pending>", Scope = "member", Target = "~F:Fast_Print.Form1.DefaultFolderPath")]
 [assembly: SuppressMessage("Lil Stinky", "S1075:URIs should not be hardcoded", Justification = "<Pending>", Scope = "member", Target = "~M:Fast_Print.Form1.OpenCsvFileDialog")]
 [assembly: SuppressMessage("Big Stank", "S1172:Unused method parameters should be removed", Justification = "<Pending>", Scope = "member", Target = "~M:Fast_Print.Form1.ShowErrorMessageBox(System.String,System.Exception)")]
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:Fast_Print.Form1.ShowErrorMessageBox(System.String,System.Exception)")]
