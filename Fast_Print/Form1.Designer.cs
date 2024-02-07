@@ -32,8 +32,10 @@
             openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             button1 = new System.Windows.Forms.Button();
             dataGridView1 = new System.Windows.Forms.DataGridView();
+            FilePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             Part_Number = new System.Windows.Forms.DataGridViewTextBoxColumn();
             Revisions = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            LastModified = new System.Windows.Forms.DataGridViewTextBoxColumn();
             button2 = new System.Windows.Forms.Button();
             printPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -45,24 +47,31 @@
             // 
             // button1
             // 
-            button1.Location = new System.Drawing.Point(13, 372);
+            button1.Location = new System.Drawing.Point(44, 372);
             button1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button1.Name = "button1";
             button1.Size = new System.Drawing.Size(161, 46);
             button1.TabIndex = 0;
             button1.Text = "Load Csv";
             button1.UseVisualStyleBackColor = true;
-            button1.Click += Btn_PrintFiles_Click;
+            button1.Click += Btn_SelectFile_Click;
             // 
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { Part_Number, Revisions });
+            dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { FilePath, Part_Number, Revisions, LastModified });
             dataGridView1.Location = new System.Drawing.Point(12, 12);
             dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new System.Drawing.Size(352, 323);
+            dataGridView1.Size = new System.Drawing.Size(496, 323);
             dataGridView1.TabIndex = 1;
+            //dataGridView1.CellClick += dataGridView1_CellClick;
             dataGridView1.CellContentClick += DataGridView1_CellContentClick;
+            // 
+            // FilePath
+            // 
+            FilePath.HeaderText = "FilePath";
+            FilePath.Name = "FilePath";
+            FilePath.Visible = false;
             // 
             // Part_Number
             // 
@@ -74,6 +83,12 @@
             Revisions.HeaderText = "Revisions";
             Revisions.Name = "Revisions";
             // 
+            // LastModified
+            // 
+            LastModified.HeaderText = "LastModified";
+            LastModified.Name = "LastModified";
+            LastModified.ReadOnly = true;
+            // 
             // button2
             // 
             button2.Location = new System.Drawing.Point(302, 372);
@@ -83,6 +98,7 @@
             button2.TabIndex = 2;
             button2.Text = "Print Preview";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += Btn_PrintFiles_Click;
             // 
             // printPreviewDialog1
             // 
@@ -110,15 +126,22 @@
             ResumeLayout(false);
         }
 
+        private void Button2_Click(object sender, System.EventArgs e)
+        {
+            throw new System.NotImplementedException();
+        }
+
         #endregion
 
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Part_Number;
-        private System.Windows.Forms.DataGridViewComboBoxColumn Revisions;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.PrintPreviewDialog printPreviewDialog1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FilePath;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Part_Number;
+        private System.Windows.Forms.DataGridViewComboBoxColumn Revisions;
+        private System.Windows.Forms.DataGridViewTextBoxColumn LastModified;
     }
 }
 

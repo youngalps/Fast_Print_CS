@@ -1,20 +1,29 @@
-﻿using System;
-using System.Drawing.Printing;
+﻿
+
+using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Patagames.Pdf.Net;
-using Patagames.Pdf.Net.Pdf
 using CsvHelper;
+using Patagames.Pdf;
+using Patagames.Pdf.Enums;
+using Patagames.Pdf.Net;
+using Patagames.Pdf.Net.Controls.WinForms;
+
+
+
+
 
 namespace Fast_Print
 {
+
+    // Declare the event
+    //public event EventHandler<CellClickEventArgs> CellClicked;
+
     public partial class Form1 : Form
     {
         // Contants
-
 
         private const string FolderPath = @"C:\Users\gedmsinv\OneDrive - GED Integrated Solutions\Desktop\DWG"; // TODO: set this to the network drive
         private const string Separator = ";";
@@ -30,67 +39,79 @@ namespace Fast_Print
             OpenCsvFileDialog();
         }
 
-
         private void Btn_PrintFiles_Click(object sender, EventArgs e)
         {
+            //PrintPDF("C:\\Users\\gedmsinv\\OneDrive - GED Integrated Solutions\\Desktop\\DWG\\3-\\" + "3-1004-A.pdf"); Debug
             PrintSelectedPDF();
         }
 
-        // Lets see what comes out 
-        private void PrintSelectedPDF()
+        // Lets see what comes out
+        private void PrintSelectedPDF()//
         {
-            foreach (DataGridViewRow row in dataGridView1.SelectedRows)
+            foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                // Get the selected part number and revision
-                string partNumber = row.Cells[0].Value.ToString();
-                string revision = row.Cells[1].Value.ToString();
+                //Get the selected part number and revision
+                if (!String.IsNullOrEmpty(row.Cells[1].Value.ToString()))
+                    if (dataGridView1.RowCount > 1)
+                    {
+                        //if (!String.IsNullOrEmpty(row.Cells[0].Value.ToString()))
+                        {
+                            string folderPathEx = row.Cells[0].Value.ToString();
+                            string partNumber = row.Cells[1].Value.ToString();
+                            string revision = row.Cells[2].Value.ToString();
 
-                // Construct the full PDF path
-                string pdfPath = Path.Combine(FolderPath, partNumber + revision + ".PDF");
+                            string pdfPath = FolderPath + folderPathEx + partNumber + revision;//Path.Combine(
 
-                // Print the selected PDF
-                PrintPDF(pdfPath);
+                            PrintPDF(pdfPath);
+                        }
+                    }
             }
-
-
         }
 
         private void PrintPDF(string pdfPath)
         {
-
             try
             {
-                using (PdfDocument document = PdfDocument.Load(pdfPath))
+                var doc = PdfDocument.Load(pdfPath);
+
+                using (var printDoc = new PdfPrintDocument(doc))
                 {
-                    using (PrintDocument printDocument = new PrintDocument())
+                    // Set up print settings if needed, e.g., printDoc.PrinterSettings
+
+                    int currentPage = 0; // Track the current page number
+
+                    printDoc.PrintPage += (sender, e) =>
                     {
-                        printDocument.PrintPage += (sender, e) =>
+                        var page = doc.Pages[currentPage];
+                        int width = (int)(page.Width / 72.0 * 96);
+                        int height = (int)(page.Height / 72.0 * 96);
+
+                        using (var bitmap = new PdfBitmap(width, height, true))
                         {
-                            document.Render(e.Graphics, e.PageBounds, 0);
-                            document.
-                        };
+                            bitmap.FillRect(0, 0, width, height, FS_COLOR.White);
+                            page.Render(bitmap, 0, 0, width, height, PageRotate.Normal, RenderFlags.FPDF_LCD_TEXT);
 
-                        printDocument.Print();
-                    }
+                            e.Graphics.DrawImage(bitmap.GetImage(), e.MarginBounds);
+                        }
+
+                        currentPage++;
+
+                        e.HasMorePages = currentPage < doc.Pages.Count;
+                    };
+
+                    printDoc.Print();
                 }
-
-                ShowSuccessMessageBox("PDF Printed Successfully");
             }
             catch (Exception ex)
             {
-                ShowErrorMessageBox("Error Printing PDF", ex);
+                ShowErrorMessageBox("Error", ex);
             }
         }
-
-
-
-
 
 
         private void Form1_Load(object sender, EventArgs e)
         {
             // Method intentionally left empty.
-
         }
 
         private void LoadCsvData(string filePath)
@@ -106,21 +127,26 @@ namespace Fast_Print
                 {
                     ProcessShopOrder(record.ShopOrder, ref clipboardContent); // goes to clipboard
                     int currentIndex = dataGridView1.Rows.Add();
-                    dataGridView1.Rows[currentIndex].Cells[0].Value = record.PartNumber;
-                    DataGridViewComboBoxCell placeholder = (DataGridViewComboBoxCell)dataGridView1.Rows[currentIndex].Cells[1];
+                    
+                    String[] TempString = Directory.GetFiles(FolderPath, record.PartNumber + "*.*", SearchOption.AllDirectories);
+                   
+                    String[] SplitString = TempString[0].Split(FolderPath);
+                    SplitString = SplitString[1].Split(record.PartNumber);
+                    dataGridView1.Rows[currentIndex].Cells[0].Value = SplitString[0];
 
+                    dataGridView1.Rows[currentIndex].Cells[1].Value = record.PartNumber;
+                    DataGridViewComboBoxCell placeholder = (DataGridViewComboBoxCell)dataGridView1.Rows[currentIndex].Cells[2];
                     String[] tempStr = FindAllFile(record.PartNumber);
                     for (Int32 i = 0; i < tempStr.Length; i++)
                     {
                         placeholder.Items.Add(tempStr[i]);
+                        placeholder.Value = placeholder.Items[0];
+                        //dataGridView1.Rows[currentIndex].Cells[3].Value = DataGridView1_CellContentClick(); 
                     }
-
-
-
                 }
             }
             ShowSuccessMessageBox("Shop Orders Copied to Clipboard");
-
+            this.Activate();
         }
 
         private void OpenCsvFileDialog()
@@ -128,7 +154,7 @@ namespace Fast_Print
             OpenFileDialog openFileDialog = new()
             {
                 Title = "Select CSV File",
-                InitialDirectory = @"C:\",
+                InitialDirectory = "C:\\Users\\gedmsinv\\OneDrive - GED Integrated Solutions\\Desktop\\Excel\\Print Test.csv", //@"C:\",
                 Filter = "CSV Files|*.csv"
             };
 
@@ -184,16 +210,50 @@ namespace Fast_Print
         {
             String[] TempString = Directory.GetFiles(FolderPath, PartNumber + "*.*", SearchOption.AllDirectories);
 
-            for (int i = 0; i < TempString.Length; i++)
+            if (TempString.Length > 0)
             {
-                TempString[i] = TempString[i].Substring(TempString[i].IndexOf(PartNumber) + PartNumber.Length);
+                for (int i = 0; i < TempString.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(TempString[i]))
+                    {
+                        TempString[i] = TempString[i].Substring(TempString[i].IndexOf(PartNumber) + PartNumber.Length);
+                        System.Diagnostics.Debug.WriteLine(PartNumber, "Printed");
+                    }
+                    else
+                    {
+                        TempString = new string[1];
+                        TempString[i] = "No Files Found";
+                    }
+                }
             }
+           
 
             return TempString;
+
+        }
+
+    }
+
+    /*
+    private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+    {
+        if(e.ColumnIndex == 3)
+        {
+            String FilePath = dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + dataGridView1.Rows[e.RowIndex].Cells[1].Value.ToString() + dataGridView1.Rows[e.RowIndex].Cells[2].Value.ToString();
+            dataGridView1.Rows[e.RowIndex].Cells[3].Value = File.GetLastWriteTime(FolderPath + FilePath).ToString();
+            //dataGridView1.Rows[e.RowIndex].Cells[3].Value = UpdateLastModified();
+
+            // Raise the event
+            OnCellClicked(new CellClickEventArgs(e.RowIndex, FilePath));
+
         }
     }
+
+
+    // Method to raise the event
+    protected virtual void OnCellClicked(CellClickEventArgs e)
+    {
+        CellClicked?.Invoke(this, e);
+    }
+    */
 }
-
-
-
-
