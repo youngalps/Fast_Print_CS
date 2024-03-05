@@ -1,7 +1,19 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)"
+              GeneratedClassNamespace="Fast_Print.Properties" GeneratedClassName="Settings">
+    <Profiles/>
+    <Settings>
+        <Setting Name="SettingExcelPath" Type="System.String" Scope="User">
+            <Value Profile="(Default)">C:\Users\gedmsinv\OneDrive - GED Integrated Solutions\Desktop\Excel</Value>
+        </Setting>
+        <Setting Name="SettingDrawingPath" Type="System.String" Scope="User">
+            <Value Profile="(Default)">C:\Users\gedmsinv\OneDrive - GED Integrated Solutions\Desktop\DWG</Value>
+        </Setting>
+        <Setting Name="SettingAcrobatPath" Type="System.String" Scope="User">
+            <Value Profile="(Default)">C:\Program Files\Adobe\Acrobat DC\Acrobat\Acrobat.exe</Value>
+        </Setting>
+        <Setting Name="SettingPrinterPath" Type="System.String" Scope="User">
+            <Value Profile="(Default)">\\gedps\MaterialsKonica</Value>
+        </Setting>
+    </Settings>
 </SettingsFile>

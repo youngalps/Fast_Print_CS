@@ -1,0 +1,31 @@
+
+S
+#Fast_Print/Classes/ParserMethods.cs,1\1\1129573941f7b1683643f61df5d70942725636f5
+E
+Fast_Print/Program.cs,a\9\a99c9627a94065a8697144a29e7abbaa72328a17
+B
+Fast_Print/Main.cs,5\f\5fcbe626bcc9b6c1786a52cc0da48b9f1e9a30f2
+P
+ Fast_Print/Classes/CsvRecords.cs,a\5\a5e830e82bd71c3395b761a53a8b5cdf96734479
+R
+"Fast_Print/Classes/FileSearcher.cs,9\6\967b51f94eadd71f5c93ce0c8ea80b7d0718eb42
+Q
+!Fast_Print/Classes/ListRecords.cs,6\d\6db288378a3654b61d24b24d2496bcbfaf148a7b
+P
+ Fast_Print/Classes/PdfPrinter.cs,5\a\5a0df013b62dca1cac4d3aa2df4e9eeae0c21c00
+F
+Fast_Print/Settings.cs,6\c\6c807ec9fbe077c691c7bd89616282579631a27a
+P
+ Fast_Print/GlobalSuppressions.cs,d\5\d5b2297cffe565eca8eb1e8149c7d6e64db8649e
+E
+Fast_Print/App.config,e\4\e49daa00d29b5472ef313a1b09ecbfeb4e811b97
+=
+.editorconfig,6\2\626a747c8694eaae66f2afb3d1a745b045782c70
+?
+Fast_Print/TODO,5\9\59755d138dacaeca79a63582585bbc11ce041dec
+Z
+*Fast_Print/Properties/Settings.Designer.cs,3\9\392c0c35509cf0ef90ebacd13f966780346799ae
+K
+Fast_Print/Main.Designer.cs,e\4\e46c3780c37d1e4e96a50d732dca17fccbde4d47
+V
+&Fast_Print/Classes/PrinterManagment.cs,c\3\c3c336bd3a5d8425efa7756b1f1f6875c94d31e6

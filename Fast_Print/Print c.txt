@@ -1,0 +1,73 @@
+ try
+            {
+                string Result = "" , Arguments = "";
+              
+                if (PrinterName != "")
+                {
+                Arguments = "/C cd " + AppDomain.CurrentDomain.BaseDirectory + " && PDFtoPrinterSelect.exe \"" + files + "\" \"" + PrinterName + "\"";
+                //    Log.WriteToFile("PDFtoPrintAuto Print command " + DateTime.Now + " " + "/C cd C:\\Program Files (x86)\\AutoPdfToPrint\\ " + "&&" + " PDFtoPrinterSelect.exe " + files + " \"" + PrinterName + "\"");
+                }
+                else
+                {
+                Arguments = "/C \"" + AppDomain.CurrentDomain.BaseDirectory + "\" PDFtoPrinter.exe \"" + files + "\"";
+                //    Log.WriteToFile("PDFtoPrintAuto Print command " + DateTime.Now + " " + "/C \"C:\\Program Files (x86)\\AutoPdfToPrint\\PDFtoPrinter.exe\" " + files + " W/ Default Printer");
+                }
+
+                if (Arguments.Contains("PDFtoPrinterSelect.exe"))
+                {
+                    while (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Path.Combine(AppDomain.CurrentDomain.BaseDirectory , "PDFtoPrinterSelect.exe"))).Count() > 0)
+                    { Thread.Sleep(500); }
+                    Result = await RunCommand(Arguments, true);
+                }
+                else
+                {
+                    while (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PDFtoPrinter.exe"))).Count() > 0)
+                    { Thread.Sleep(500); }
+                    Result = await RunCommand(Arguments, true);
+                }
+
+                Log.WriteToFile("PDFtoPrintAuto Print processed " + DateTime.Now + " " + Arguments + " : " + Result.ToString());
+
+
+            }
+            catch (IOException)
+            {
+
+                Log.WriteToFile("PDFToPrint Command Print Failed: " + Folder + " " + files + " " + "Printer :  " + PrinterName + " " + DateTime.Now);
+
+                return true;
+            }
+
+private async Task<string> RunCommand(string arguments, bool readOutput)
+        {
+            var output = string.Empty;
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    Verb = "runas",
+                    FileName = "cmd.exe",
+                    Arguments = arguments,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = false
+                };
+
+                var proc = Process.Start(startInfo);
+
+                if (readOutput)
+                {
+                    output = proc.StandardOutput.ReadToEnd();
+                }
+
+                proc.WaitForExit(1500);
+
+                return output;
+            }
+            catch (Exception)
+            {
+                return output;
+            }
+        }
