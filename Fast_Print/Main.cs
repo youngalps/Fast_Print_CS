@@ -35,7 +35,6 @@ public partial class Main : Form
         InitializeComponent();
     }
 
-    //private DataGridView FileGridView { get; set; }
 
     private void Btn_SelectFile_Click(object sender, EventArgs e)
     {
@@ -101,19 +100,27 @@ public partial class Main : Form
     }
 
 
-    private void PopulateGridView(int index, string partNo, List<string> matchedFiles, FileInfo collectedFiles)
+    private void PopulateGridView(int index, string partNo, List<string> matchedFiles, FileInfo collectedFiles,string shopOrder)
     {
 
         try
         {
             Invoke(new MethodInvoker(() =>
             {
+                // 0 - File Path
+                // 1 - SO
+                // 2 - Part Number
+                // 3 - Revision
+                // 4 - Print Status
+                // 5 - Index
+
                 // Add the collected files to the grid view
                 FileGridView.Rows[index].Cells[0].Value = collectedFiles.FullName;
-                FileGridView.Rows[index].Cells[1].Value = partNo;
-                FileGridView.Rows[index].Cells[4].Value = index;
+                FileGridView.Rows[index].Cells[1].Value = shopOrder;
+                FileGridView.Rows[index].Cells[2].Value = partNo; // get the part number
+                FileGridView.Rows[index].Cells[5].Value = index; 
 
-                var revisionComboBoxCell = (DataGridViewComboBoxCell)FileGridView.Rows[index].Cells[2];
+                var revisionComboBoxCell = (DataGridViewComboBoxCell)FileGridView.Rows[index].Cells[3];
 
                 foreach (var file in matchedFiles.Where(file => file != null))
                     revisionComboBoxCell.Items.Add(file);
@@ -126,69 +133,44 @@ public partial class Main : Form
         }
     }
 
-    private void LoadCsvFileData(string filePath)
+    private async void LoadCsvFileData(string filePath)
     {
         using var reader = new StreamReader(filePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
         try
         {
-            var records = csv.GetRecords<CsvRecords>();
+            var records = csv.GetRecords<CsvRecords>().ToList();
+            var processedRecordsTasks = records.Select((record, index) =>
+                ProcessRecordAsync(record, index)).ToList();
 
-            foreach (var record in records)
+            var processedRecords = await Task.WhenAll(processedRecordsTasks);
+
+            foreach (var (Record, Order, Files) in processedRecords.OrderBy(x => x.Order))
             {
-                _clipboardList.Add(record.ShopOrder);
-
-                var threads = new Thread(Start);
-                threads.SetApartmentState(ApartmentState.STA); // Set the thread to STA
-                threads.Start();
-
-
-                // Modified to collect threads for each record processing
-                async void Start() => await CollectRecord(record);
+                Invoke((MethodInvoker)(() => PopulateGridViewForRecord(Record, Files)));
             }
-
-            CopyToClipboardList(_clipboardList);
         }
-        catch (Exception)
+        catch (CsvHelper.HeaderValidationException ex)
         {
-            MessageBox.Show(@"Error Loading CSV File", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        MessageBox.Show(@"Shop Order's Copied", @"Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //Activate();
-    }
-
-    private async Task CollectRecord(CsvRecords record)
-    {
-        try
-        {
-            var files = await Task.Run(() =>
-                _gedDir.GetFiles($"{record.PartNumber}*.PDF", SearchOption.AllDirectories));
-            var matchedFiles = new List<string>(); // List of matched files
-
-
-            foreach (var file in files)
-            {
-                _collectedFiles.Add(file);
-                var partNumberIndex = file.Name.IndexOf(record.PartNumber, StringComparison.OrdinalIgnoreCase);
-                if (partNumberIndex != -1)
-                    matchedFiles.Add(file.Name[(partNumberIndex + record.PartNumber.Length)..]);
-            }
-
-            int index;
-
-            Invoke(new MethodInvoker(() =>
-            {
-                index = FileGridView.Rows.Add();
-                PopulateGridView(index, record.PartNumber, matchedFiles, files.Length > 0 ? files[0] : null);
-            }));
+            MessageBox.Show($"CSV Header Validation Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         catch (Exception ex)
         {
-            Invoke(new MethodInvoker(() => { MessageBox.Show(ex.ToString(), @"Error Collecting Files"); }));
+            MessageBox.Show($"Error Loading CSV File: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
+
+    
+    private async Task<(CsvRecords Record, int Order, List<FileInfo> Files)> ProcessRecordAsync(CsvRecords record, int order)
+    {
+        var files = await Task.Run(() => _gedDir.EnumerateFiles("*.PDF", SearchOption.AllDirectories)
+            .Where(file => file.Name.StartsWith(record.PartNumber)).ToList());
+
+        return (record, order, files);
+    }
+
+  
 
     private void OpenCsvFileBrowserDialog()
     {
@@ -243,5 +225,9 @@ public partial class Main : Form
 
     }
 
- 
+    private void PopulateGridViewForRecord(CsvRecords record, List<FileInfo> files)
+    {
+        var index = FileGridView.Rows.Add();
+        PopulateGridView(index, record.PartNumber, files.Select(f => f.Name).ToList(), files.FirstOrDefault(), record.ShopOrder);
+    }
 }

@@ -10,6 +10,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Remove="Classes\AppSettings.cs" />
+        <Compile Remove="Classes\ListRecords.cs" />
         <Compile Remove="Classes\PdfPrinter2.cs" />
         <Compile Remove="Classes\FileSearcher.cs" />
     </ItemGroup>

@@ -43,6 +43,7 @@
             FileGridView = new System.Windows.Forms.DataGridView();
             button4 = new System.Windows.Forms.Button();
             FilePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            Shop_Order = new System.Windows.Forms.DataGridViewTextBoxColumn();
             PartNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
             Revision = new System.Windows.Forms.DataGridViewComboBoxColumn();
             PrintStatus = new System.Windows.Forms.DataGridViewImageColumn();
@@ -149,7 +150,7 @@
             FileGridView.AllowUserToAddRows = false;
             FileGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             FileGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            FileGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { FilePath, PartNumber, Revision, PrintStatus, Index });
+            FileGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { FilePath, Shop_Order, PartNumber, Revision, PrintStatus, Index });
             FileGridView.Location = new System.Drawing.Point(-1, 43);
             FileGridView.Name = "FileGridView";
             FileGridView.Size = new System.Drawing.Size(572, 354);
@@ -172,6 +173,11 @@
             FilePath.HeaderText = "FilePath";
             FilePath.Name = "FilePath";
             FilePath.Visible = false;
+            // 
+            // Shop_Order
+            // 
+            Shop_Order.HeaderText = "SO#";
+            Shop_Order.Name = "Shop_Order";
             // 
             // PartNumber
             // 
@@ -242,6 +248,7 @@
         private System.Windows.Forms.DataGridView FileGridView;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.DataGridViewTextBoxColumn FilePath;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Shop_Order;
         private System.Windows.Forms.DataGridViewTextBoxColumn PartNumber;
         private System.Windows.Forms.DataGridViewComboBoxColumn Revision;
         private System.Windows.Forms.DataGridViewImageColumn PrintStatus;
