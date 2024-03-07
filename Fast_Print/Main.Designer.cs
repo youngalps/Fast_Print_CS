@@ -1,4 +1,6 @@
-﻿namespace Fast_Print
+﻿using Fast_Print.Classes;
+
+namespace Fast_Print
 {
     partial class Main
     {
@@ -42,12 +44,12 @@
             fsw = new System.IO.FileSystemWatcher();
             FileGridView = new System.Windows.Forms.DataGridView();
             button4 = new System.Windows.Forms.Button();
+            button5 = new System.Windows.Forms.Button();
             FilePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             Shop_Order = new System.Windows.Forms.DataGridViewTextBoxColumn();
             PartNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
             Revision = new System.Windows.Forms.DataGridViewComboBoxColumn();
             PrintStatus = new System.Windows.Forms.DataGridViewImageColumn();
-            Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)fsw).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FileGridView).BeginInit();
             SuspendLayout();
@@ -98,7 +100,7 @@
             button2.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             button2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             button2.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            button2.Location = new System.Drawing.Point(433, 403);
+            button2.Location = new System.Drawing.Point(409, 403);
             button2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button2.Name = "button2";
             button2.Size = new System.Drawing.Size(125, 52);
@@ -119,7 +121,7 @@
             // 
             // ClearGrid
             // 
-            ClearGrid.Location = new System.Drawing.Point(196, 417);
+            ClearGrid.Location = new System.Drawing.Point(169, 417);
             ClearGrid.Name = "ClearGrid";
             ClearGrid.Size = new System.Drawing.Size(81, 28);
             ClearGrid.TabIndex = 3;
@@ -132,7 +134,7 @@
             button3.Image = Properties.Resources.Icon_Settings;
             button3.Location = new System.Drawing.Point(-1, 0);
             button3.Name = "button3";
-            button3.Size = new System.Drawing.Size(572, 37);
+            button3.Size = new System.Drawing.Size(303, 45);
             button3.TabIndex = 4;
             button3.UseVisualStyleBackColor = true;
             button3.Click += Settings_Click_Btn;
@@ -150,23 +152,34 @@
             FileGridView.AllowUserToAddRows = false;
             FileGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             FileGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            FileGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { FilePath, Shop_Order, PartNumber, Revision, PrintStatus, Index });
+            FileGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { FilePath, Shop_Order, PartNumber, Revision, PrintStatus });
             FileGridView.Location = new System.Drawing.Point(-1, 43);
             FileGridView.Name = "FileGridView";
             FileGridView.Size = new System.Drawing.Size(572, 354);
             FileGridView.TabIndex = 5;
-            FileGridView.CellContentClick += FileGridView_CellContentClick;
-            FileGridView.Sorted += button4_Click;
             // 
             // button4
             // 
-            button4.Location = new System.Drawing.Point(301, 417);
+            button4.Location = new System.Drawing.Point(269, 417);
             button4.Name = "button4";
             button4.Size = new System.Drawing.Size(84, 28);
             button4.TabIndex = 6;
-            button4.Text = "button4";
+            button4.Text = "Clipboard";
             button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_Click;
+            button4.Click += Btn_CopyClipBoard;
+            // 
+            // button5
+            // 
+            button5.BackColor = System.Drawing.Color.Red;
+            button5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            button5.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            button5.Location = new System.Drawing.Point(299, 0);
+            button5.Name = "button5";
+            button5.Size = new System.Drawing.Size(272, 45);
+            button5.TabIndex = 7;
+            button5.Text = "STOP PRINTING";
+            button5.UseVisualStyleBackColor = false;
+            button5.Click += Btn_StopPrinting;
             // 
             // FilePath
             // 
@@ -196,11 +209,6 @@
             PrintStatus.HeaderText = "Print Status";
             PrintStatus.Name = "PrintStatus";
             // 
-            // Index
-            // 
-            Index.HeaderText = "Index";
-            Index.Name = "Index";
-            // 
             // Main
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -208,6 +216,7 @@
             AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             BackColor = System.Drawing.SystemColors.GrayText;
             ClientSize = new System.Drawing.Size(571, 466);
+            Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(FileGridView);
             Controls.Add(button3);
@@ -247,12 +256,12 @@
         private System.Windows.Forms.DataGridViewImageColumn colPrinterStatus;
         private System.Windows.Forms.DataGridView FileGridView;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.DataGridViewTextBoxColumn FilePath;
         private System.Windows.Forms.DataGridViewTextBoxColumn Shop_Order;
         private System.Windows.Forms.DataGridViewTextBoxColumn PartNumber;
         private System.Windows.Forms.DataGridViewComboBoxColumn Revision;
         private System.Windows.Forms.DataGridViewImageColumn PrintStatus;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Index;
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using Fast_Print.Classes;
 
 namespace Fast_Print;
 
@@ -7,11 +8,14 @@ public partial class Settings : Form
 {
     // initialize Main form
     private readonly Main _mainform;
+    private readonly FileWatcher _fileWatcher;
 
-    public Settings(Main mainForm)
+    public Settings(Main mainForm, FileWatcher fileWatcher)
     {
         InitializeComponent();
         _mainform = mainForm;
+        
+
 
         // Apply the loaded settings to the form's properties
         excelPath.Text = Properties.Settings.Default.SettingExcelPath;
@@ -21,7 +25,10 @@ public partial class Settings : Form
 
         // Now that we have loadedSettings, we can pass it to PdfPrinter
         // Assuming Main form has a public property or method to access PublicFileGridView
+        
     }
+
+ 
 
 
     private void Settings_Load(object sender, EventArgs e)
