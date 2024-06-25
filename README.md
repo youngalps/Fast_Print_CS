@@ -1,6 +1,6 @@
 # Fast_Print_CS
 
-## Contributing Noah
+## 🤝 Contributing
 Help - Allen Jones
 
 
