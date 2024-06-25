@@ -1,7 +1,6 @@
 # Fast_Print_CS
 
-## Contributing
-Main Programmer - Noah
+## Contributing Noah
 Help - Allen Jones
 
 
